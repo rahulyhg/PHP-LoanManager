@@ -1,0 +1,81 @@
+{
+    "objects": {
+        "sources": [
+            "iPublications\\Financial\\Debtor",
+            "iPublications\\Financial\\Loan",
+            "iPublications\\Financial\\LoanPart",
+            "iPublications\\Financial\\LoanPartMutation"
+        ],
+        "targets": [
+            "iPublications\\Financial\\Loan"
+        ]
+    },
+    "debtor": {
+        "identifier": "Wietse Wind",
+        "uid": "bf8e246f2c850ea204d6a5437725ee9a"
+    },
+    "loan": {
+        "start_date": "2016-01-01"
+    },
+    "mutations": {
+        "DEEL1": [
+            {
+                "amount_mutation": 100,
+                "date": "2016-01-07"
+            },
+            {
+                "date": "2016-04-02",
+                "interest_percentage": 4.2
+            },
+            {
+                "date": "2016-01-03",
+                "interest_percentage": 2.9,
+                "interest_type": "INTEREST_COMPOUND"
+            },
+            {
+                "date": "2016-09-03",
+                "interest_percentage": 1.9
+            },
+            {
+                "date": "2020-01-01",
+                "interest_percentage": 2
+            }
+        ],
+        "DEEL2": [
+            {
+                "date": "2016-04-03",
+                "interest_percentage": 6.8
+            },
+            {
+                "amount_mutation": 1000,
+                "date": "2016-09-01",
+                "interest_percentage": 6.9
+            }
+        ]
+    },
+    "parts": {
+        "DEEL1": {
+            "identifier": "DEEL1",
+            "initial_mutation": {
+                "amount": 6000,
+                "currency": "EUR",
+                "date": "2016-01-01",
+                "interest_percentage": 5.6,
+                "interest_type": "INTEREST_SIMPLE"
+            },
+            "type": "COMPONENT_LOAN"
+        },
+        "DEEL2": {
+            "identifier": "DEEL2",
+            "initial_mutation": {
+                "amount": 100,
+                "currency": "USD",
+                "date": "2016-01-01",
+                "interest_percentage": 2.3,
+                "interest_type": "INTEREST_COMPOUND"
+            },
+            "type": "COMPONENT_GRANT"
+        }
+    },
+    "version": 1
+}
