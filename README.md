@@ -5,9 +5,22 @@ Allows managing and calculating **Loans** using only **mutations**. Mutations do
 
 ## Usage
 
-Please check the `samples` folder. 
+Please check the `samples` folder. When using the WebInterface, use GET-parameters to set data in a PHP session to debug. Sample URL:
 
-#### Short description
+`index.php?till=2016-W03&web=0&daily=0&url=https://raw.githubusercontent.com/iPublications/PHP-LoanManager/master/samples/assets/Loan_Serialized.json`
+
+#### Parameters
+
+- `till=` (string, strtotime)
+End date calculation render
+- `web=` (int, 0/1)
+Display WebInterface (HTML) if `1`, or JSON feed if `0`
+- `daily=` (int, 0/1) 
+Render the daily mutations if `1`
+- `url=` (string, file_get_contents)
+Enter the remote URL containing a JSON serialized `Loan` (see _Short description_ below). Instead of an URL, the HTTP POST body can be used (`php://input`) when rendering JSON output (`web=0`)
+
+## Short description
 
 Use either PHP code or a JSON serialized `Loan` to set-up loans. 
 
