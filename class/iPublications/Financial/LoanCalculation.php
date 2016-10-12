@@ -20,6 +20,8 @@ class LoanCalculation implements \JsonSerializable {
     private $M_i_startDateUnixtime;
     private $M_i_endDateUnixtime;
 
+    private $M_a_mutationTotals = [];
+
     /**
      * Magic Methods
      **/
@@ -68,14 +70,19 @@ class LoanCalculation implements \JsonSerializable {
         return $this->M_o_loan->getDetails();
     }
 
+    public function getMutationTotals($P_s_loanPart = ''){
+        if(!empty($P_s_loanPart) && isset($this->M_a_mutationTotals) && is_array($this->M_a_mutationTotals) && isset($this->M_a_mutationTotals[$P_s_loanPart])){
+            return @$this->M_a_mutationTotals[$P_s_loanPart];
+        }
+        return [];
+    }
+
     public function getLoanPartDetails(){
         $L_a_loanPartDetails = [];
         $L_a_loanParts       = $this->M_o_loan->getLoanParts();
         array_walk($L_a_loanParts, function($loanPartIdentifier) use (&$L_a_loanPartDetails){
             $L_o_loanPart                             = $this->M_o_loan->getLoanPart($loanPartIdentifier);
-            $L_a_loanPartDetails[$loanPartIdentifier] = [
-                'type' => $L_o_loanPart->getDetails()['type'],
-            ];
+            $L_a_loanPartDetails[$loanPartIdentifier] = $L_o_loanPart->getDetails();
         });
         return $L_a_loanPartDetails;
     }
@@ -89,15 +96,32 @@ class LoanCalculation implements \JsonSerializable {
      * Private Methods
      **/
 
+    private function constructLoanPartMutationTotals(){
+        return [
+            'loan' => [
+                'payout'   => 0,
+                'receive'  => 0,
+            ],
+            'interest' => [
+                'increase' => 0,
+                'receive'  => 0,
+            ],
+        ];
+    }
+
     private function calculateLoanPart(LoanPart $P_o_loanPart){
         $L_a_calculation = [];
         $L_a_mutations   = $P_o_loanPart->getMutations();
+
+        if(!isset($this->M_a_mutationTotals[$P_o_loanPart->getIdentifier()])){
+            $this->M_a_mutationTotals[$P_o_loanPart->getIdentifier()] = $this->constructLoanPartMutationTotals();
+        }
 
         $L_loanAmount             = (float)  $L_a_mutations[0]->getAmount();
         $L_loanInterestPercentage = (float)  $L_a_mutations[0]->getInterestPercentage();
         $L_loanCurrency           = (string) $L_a_mutations[0]->getCurrency();
         $L_loanInterestType       = (string) $L_a_mutations[0]->getInterestType();
-        $L_interestAmount         = 0;
+        $L_interestAmount         = (float)  $L_a_mutations[0]->getInterestAmount();
 
         // Todo: convert rate on change of currency (rate-exchange)
 
@@ -111,20 +135,44 @@ class LoanCalculation implements \JsonSerializable {
 
             $I_a_mutations   = [];
             if(isset($L_a_mutations[$i])){
-                foreach([ 'Amount', 'InterestPercentage', 'Currency', 'InterestType' ] as $applyChange){
+                foreach([ 'Amount', 'InterestAmount', 'InterestPercentage', 'Currency', 'InterestType' ] as $applyChange){
 
-                    $oldValue = @${'L_loan'.$applyChange};
+                    if($applyChange !== 'InterestAmount'){
+                        $oldValue = @${'L_loan'.$applyChange};
+                    }else{
+                        $oldValue = $L_interestAmount;
+                    }
 
                     // Only the first mutation can set the Amount itself,
                     // hereafter only AmountMutation(s) can be set
                     if($applyChange == 'Amount'){
                         $newValue = $oldValue + $L_a_mutations[$i]->getAmountMutation();
+
+                        if($L_a_mutations[$i]->getAmountMutation() > 0){
+                            $this->M_a_mutationTotals[$P_o_loanPart->getIdentifier()]['loan']['payout']
+                                += $L_a_mutations[$i]->getAmountMutation();
+                        }elseif($L_a_mutations[$i]->getAmountMutation() < 0){
+                            $this->M_a_mutationTotals[$P_o_loanPart->getIdentifier()]['loan']['receive']
+                                += $L_a_mutations[$i]->getAmountMutation()*-1;
+                        }
+
+                    }elseif($applyChange == 'InterestAmount' && !is_null($L_a_mutations[$i]->getInterestAmountMutation())){
+                        $newValue = $oldValue + $L_a_mutations[$i]->getInterestAmountMutation();
+                        $L_interestAmount += $L_a_mutations[$i]->getInterestAmountMutation();
+                        $I_a_mutations['InterestDeduction'] = '{'.$L_loanCurrency.'} -=> {'.(((float)$L_a_mutations[$i]->getInterestAmountMutation())*-1).'}';
+
+                        // Interest return
+                        if($L_a_mutations[$i]->getInterestAmountMutation() < 0){
+                            $this->M_a_mutationTotals[$P_o_loanPart->getIdentifier()]['interest']['receive']
+                                += $L_a_mutations[$i]->getInterestAmountMutation()*-1;
+                        }
+
                     }else{
                         $newValue = $L_a_mutations[$i]->{'get'.$applyChange}();
                     }
 
                     if(!is_null($newValue)){
-                        if($oldValue !== $newValue){
+                        if($oldValue !== $newValue && $applyChange !== 'InterestAmount'){
                             $I_a_mutations[$applyChange] = '{'.$oldValue.'} => {'.$newValue.'}';
                             @${'L_loan'.$applyChange} = $newValue;
                         }
@@ -147,6 +195,11 @@ class LoanCalculation implements \JsonSerializable {
             if($additionalInterest > 0 || $additionalInterest < 0){
                 $L_interestAmount += $additionalInterest;
                 $I_a_mutations['InterestAmount'] = '{'.$L_loanCurrency.'} +=> {'.$additionalInterest.'}';
+                if((float) $additionalInterest > 0){
+                    $this->M_a_mutationTotals[$P_o_loanPart->getIdentifier()]['interest']['increase']
+                        += $additionalInterest;
+                }
+
             }
 
             /**

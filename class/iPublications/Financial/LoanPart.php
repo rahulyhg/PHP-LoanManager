@@ -76,6 +76,9 @@ class LoanPart implements \JsonSerializable {
             if(!is_null($P_o_mutation->getAmount())){
                 throw new Exception(__METHOD__ . ": setAmount invalid for non-initial LoanPartMutation");
             }
+            if(!is_null($P_o_mutation->getInterestAmount())){
+                throw new Exception(__METHOD__ . ": setInterestAmount invalid for non-initial LoanPartMutation");
+            }
 
             if($L_i_addedMutationTimestamp > $this->M_a_loanPartMutations[0]->getDate(true)){
                 if(isset($this->M_a_loanPartMutations[$L_i_addedMutationTimestamp])){
@@ -87,7 +90,7 @@ class LoanPart implements \JsonSerializable {
                      *       incresed DEBT is positive and
                      *       decreased DEBT is negative
                      */
-                    foreach([ /*'Amount',*/ 'AmountMutation', 'InterestPercentage', 'Currency', 'InterestType' ] as $applyChange){
+                    foreach([ /*'Amount',*/ 'AmountMutation', 'InterestAmountMutation', 'InterestPercentage', 'Currency', 'InterestType' ] as $applyChange){
                         $applyValue = $P_o_mutation->{'get'.$applyChange}();
                         if(!is_null($applyValue)){
                             $this->M_a_loanPartMutations[$L_i_addedMutationTimestamp]->{'set'.$applyChange}($applyValue);
@@ -121,7 +124,15 @@ class LoanPart implements \JsonSerializable {
     }
 
     public function getDetails(){
-        return [ 'type' => $this->M_s_loanPartType ];
+        $L_o_initialMutation = @reset(@$this->getMutations());
+        return [
+            'type' => $this->M_s_loanPartType ,
+            'start' => [
+                'amount'         => (float) @$L_o_initialMutation->getAmount(),
+                'interestamount' => (float) @$L_o_initialMutation->getInterestAmount(),
+            ],
+            'currency' => @$L_o_initialMutation->getCurrency(),
+        ];
     }
 
     /**

@@ -70,6 +70,11 @@ class Json implements \JsonSerializable {
                 'interest' => [
                   'percentage' => (float) $L_a_meta['interest_percentage'],
                   'type'       => (string) $L_a_meta['interest_type'],
+                  'start'      => [
+                    'date'     => $this->M_o_loanCalculation->getLoanDetails()['startdate'],
+                    'amount'   => (float) @$L_a_lpDetails['start']['interestamount'],
+                    'currency' => (string) $L_a_meta['loan_currency'],
+                  ],
                 ],
               ],
             ],
@@ -80,6 +85,7 @@ class Json implements \JsonSerializable {
               'loan'     => (float) end($this->M_a_calculationResults[$part])['values']['loan_amount'],
               'interest' => (float) end($this->M_a_calculationResults[$part])['values']['interest_amount'],
             ],
+            'realisation' => @$this->M_o_loanCalculation->getMutationTotals($part),
             'daily'  => [],
           ];
 

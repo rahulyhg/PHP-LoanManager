@@ -191,7 +191,8 @@ class Loan implements \JsonSerializable {
                             $loanPart = new LoanPart(
                                 (new LoanPartMutation())
                                     ->setInterestType(constant('iPublications\\Financial\\LoanPartMutation::' . $partData->initial_mutation->interest_type))
-                                    ->setAmount($partData->initial_mutation->amount, $partData->initial_mutation->currency)
+                                    ->setAmount( (float) @$partData->initial_mutation->amount, @$partData->initial_mutation->currency)
+                                    ->setInterestAmount( (float) @$partData->initial_mutation->interestamount)
                                     ->setInterestPercentage($partData->initial_mutation->interest_percentage),
                                 constant('iPublications\\Financial\\LoanPart::' . $partData->type),
                                 $partData->identifier
@@ -209,6 +210,9 @@ class Loan implements \JsonSerializable {
                                     }
                                     if(isset($mutation->amount_mutation)){
                                         $mutationObject->setAmountMutation((float) $mutation->amount_mutation, @$mutation->currency);
+                                    }
+                                    if(isset($mutation->interestamount_mutation)){
+                                        $mutationObject->setInterestAmountMutation((float) $mutation->interestamount_mutation, @$mutation->currency);
                                     }
 
                                     $loanPart->addMutation($mutationObject);

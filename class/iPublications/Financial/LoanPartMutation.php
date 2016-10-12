@@ -22,7 +22,9 @@ class LoanPartMutation implements \JsonSerializable {
     private $M_i_dateUnixtime;
 
     private $M_f_loanAmount;
+    private $M_f_interestAmount;
     private $M_f_loanAmountMutation;
+    private $M_f_interestAmountMutation;
     private $M_s_loanCurrency;
     private $M_s_loanInterestType;
     private $M_f_loanInterestPercentage;
@@ -49,8 +51,14 @@ class LoanPartMutation implements \JsonSerializable {
         if(!empty($this->M_f_loanAmount))
             $L_a_returnMutation['amount'] = (float) @$this->M_f_loanAmount;
 
+        if(!empty($this->M_f_interestAmount))
+            $L_a_returnMutation['interestamount'] = (float) @$this->M_f_interestAmount;
+
         if(!empty($this->M_f_loanAmountMutation))
             $L_a_returnMutation['amount_mutation'] = (float) @$this->M_f_loanAmountMutation;
+
+        if(!empty($this->M_f_interestAmountMutation))
+            $L_a_returnMutation['interestamount_mutation'] = (float) @$this->M_f_interestAmountMutation;
 
         if(!empty($this->M_f_loanInterestPercentage))
             $L_a_returnMutation['interest_percentage'] = (float) @$this->M_f_loanInterestPercentage;
@@ -68,6 +76,7 @@ class LoanPartMutation implements \JsonSerializable {
      * Public Methods
      **/
 
+
     public function setAmount($P_f_loanAmount = 0, $P_s_currency = null){
         if(!is_int($P_f_loanAmount) && !is_float($P_f_loanAmount)){
             throw new Exception(__METHOD__ . ": invalid value, expects int or float");
@@ -82,12 +91,36 @@ class LoanPartMutation implements \JsonSerializable {
         return $this;
     }
 
+    public function setInterestAmount($P_f_interestAmount = 0){
+        if(!is_int($P_f_interestAmount) && !is_float($P_f_interestAmount)){
+            throw new Exception(__METHOD__ . ": invalid value, expects int or float");
+        }
+
+        $this->M_f_interestAmount = (float) $P_f_interestAmount;
+
+        return $this;
+    }
+
     public function setAmountMutation($P_f_loanAmountMutation = 0, $P_s_currency = null){
         if(!is_int($P_f_loanAmountMutation) && !is_float($P_f_loanAmountMutation)){
             throw new Exception(__METHOD__ . ": invalid value, expects int or float");
         }
 
         $this->M_f_loanAmountMutation = (float) $P_f_loanAmountMutation;
+
+        return $this;
+    }
+
+    public function setInterestAmountMutation($P_f_interestAmountMutation = 0, $P_s_currency = null){
+        if(!is_int($P_f_interestAmountMutation) && !is_float($P_f_interestAmountMutation)){
+            throw new Exception(__METHOD__ . ": invalid value, expects int or float");
+        }
+
+        $this->M_f_interestAmountMutation = (float) $P_f_interestAmountMutation;
+
+        if($this->M_f_interestAmountMutation > 0){
+            throw new Exception(__METHOD__ . ": invalid value, expects *negative* int or float (deduction)");
+        }
 
         return $this;
     }
@@ -150,9 +183,29 @@ class LoanPartMutation implements \JsonSerializable {
         return null;
     }
 
+    public function getInterestAmount($P_f_fallback = null){
+        if(isset($this->M_f_interestAmount) && (is_float($this->M_f_interestAmount) || is_int($this->M_f_interestAmount))){
+            return $this->M_f_interestAmount;
+        }else{
+            if(!is_null($P_f_fallback) && !is_empty($P_f_fallback) && (is_float($P_f_fallback) || is_int($P_f_fallback))){
+                return $P_f_fallback;
+            }
+        }
+
+        return null;
+    }
+
     public function getAmountMutation(){
         if(isset($this->M_f_loanAmountMutation) && (is_float($this->M_f_loanAmountMutation) || is_int($this->M_f_loanAmountMutation))){
             return $this->M_f_loanAmountMutation;
+        }
+
+        return null;
+    }
+
+    public function getInterestAmountMutation(){
+        if(isset($this->M_f_interestAmountMutation) && (is_float($this->M_f_interestAmountMutation) || is_int($this->M_f_interestAmountMutation))){
+            return $this->M_f_interestAmountMutation;
         }
 
         return null;

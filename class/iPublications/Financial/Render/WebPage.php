@@ -281,7 +281,7 @@ class WebPage {
                 <td>UID</td>
                 <td><q><code>' . $this->M_o_loanCalculation->getDebtorDetails()['uid'] . '</code></q></td>
               </tr>
-              <tr>
+              <tr style="border-top: 2px solid black;">
                 <td><b>Loan</b></td>
                 <td>startDate</td>
                 <td><q><code>' . $this->M_o_loanCalculation->getLoanDetails()['startdate'] . '</code></q></td>
@@ -292,6 +292,7 @@ class WebPage {
                 <td>
                   <q><code>' . number_format($L_a_meta['loan_amount'],2) . '</code></q>
                   <q><code>' . $L_a_meta['loan_currency'] . '</code></q>
+                  <small style="color: #999;">(rounded @ 2 decimals)</small>
                 </td>
               </tr>
               <tr>
@@ -299,8 +300,22 @@ class WebPage {
                 <td>Type</td>
                 <td><q><code>' . $L_a_lpDetails['type'] . '</code></q></td>
               </tr>
-              <tr>
+              <tr style="border-top: 2px solid black;">
                 <td><b>Interest</b></td>
+                <td>startDate</td>
+                <td><q><code>' . $this->M_o_loanCalculation->getLoanDetails()['startdate'] . '</code></q></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Amount, Currency</td>
+                <td>
+                  <q><code>' . number_format(@$L_a_lpDetails['start']['interestamount'], 2) . '</code></q>
+                  <q><code>' . $L_a_meta['loan_currency'] . '</code></q>
+                  <small style="color: #999;">(rounded @ 2 decimals)</small>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
                 <td>Percentage</td>
                 <td><q><code>' . $L_a_meta['interest_percentage'] . '</code></q></td>
               </tr>
@@ -309,7 +324,7 @@ class WebPage {
                 <td>Type</td>
                 <td><q><code>' . $L_a_meta['interest_type'] . '</code></q></td>
               </tr>
-              <tr>
+              <tr style="border-top: 2px solid black;">
                 <td><b>Calculation</b></td>
                 <td>Date range</td>
                 <td><code>' . $this->M_o_loanCalculation->getLoanDetails()['startdate'] . '</code> - <code>' . $this->M_o_loanCalculation->getCalculationEndDate() . '</code></td>
@@ -354,6 +369,27 @@ class WebPage {
                 <td>
                   <q><code>' . number_format(end($this->M_a_calculationResults[$part])['values']['loan_amount'] + end($this->M_a_calculationResults[$part])['values']['interest_amount'],2) . '</code></q>
                   <q><code>' . $L_a_meta['loan_currency'] . '</code></q>
+                </td>
+              </tr>
+              <tr style="border-top: 2px solid black;">
+                <td><b>Mutation Totals</b></td>
+                <td>Date range</td>
+                <td><code>' . $this->M_o_loanCalculation->getLoanDetails()['startdate'] . '</code> - <code>' . $this->M_o_loanCalculation->getCalculationEndDate() . '</code></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Loan</td>
+                <td>
+                  Payout   <q><code>'.number_format(@$this->M_o_loanCalculation->getMutationTotals($part)['loan']['payout'],2).'</code></q> -
+                  Receive  <q><code>'.number_format(@$this->M_o_loanCalculation->getMutationTotals($part)['loan']['receive'],2).'</code></q>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Interest</td>
+                <td>
+                  Increase <q><code>'.number_format(@$this->M_o_loanCalculation->getMutationTotals($part)['interest']['increase'],2).'</code></q> -
+                  Receive  <q><code>'.number_format(@$this->M_o_loanCalculation->getMutationTotals($part)['interest']['receive'],2).'</code></q>
                 </td>
               </tr>
             </tbody>
