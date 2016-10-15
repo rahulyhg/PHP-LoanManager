@@ -184,8 +184,11 @@ class LoanCalculation implements \JsonSerializable {
              * Calculate debt
              **/
             if($L_loanInterestType == LoanPartMutation::INTEREST_SIMPLE){
-                $I_f_dayInterest    = pow( 1+($L_loanInterestPercentage/100), 1/$I_i_yearDays)-1;
-                $additionalInterest = ( ($L_loanAmount+$L_interestAmount) * (1+$I_f_dayInterest) ) - ($L_loanAmount+$L_interestAmount);
+                // $I_f_dayInterest    = pow( 1+($L_loanInterestPercentage/100), 1/$I_i_yearDays)-1;
+                $I_f_dayInterest = $L_loanInterestPercentage/100/$I_i_yearDays;
+
+                // $additionalInterest = ( ($L_loanAmount+$L_interestAmount) * (1+$I_f_dayInterest) ) - ($L_loanAmount+$L_interestAmount);
+                $additionalInterest = ( ($L_loanAmount) * (1+$I_f_dayInterest) ) - ($L_loanAmount);
             }else{
                 //(6000*(1+(0,056/365))^(365))-6000
                 $I_f_dayInterest    = ( ($L_loanInterestPercentage/100) / $I_i_yearDays );
