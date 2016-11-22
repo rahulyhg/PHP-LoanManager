@@ -14,6 +14,7 @@ require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'boo
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 $data = file_get_contents(dirname(__FILE__).DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'Loan_Serialized.json');
+// $data = file_get_contents('http://localhost/interest/samples/webinterface-from-objects?json=true');
 $loan = Loan::constructFromJson($data);
 
 $calculation = new LoanCalculation($loan, '2017-12-31');

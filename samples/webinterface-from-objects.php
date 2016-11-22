@@ -21,21 +21,27 @@ require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'boo
       [
           $loan_1 =   new LoanPart(
                           (new LoanPartMutation())
-                              ->setInterestType(LoanPartMutation::INTEREST_COMPOUND)
+                              ->setInterestType(LoanPartMutation::INTEREST_SIMPLE)
                               ->setAmount(6000, 'EUR')
-                              ->setInterestAmount(423.4312331324)
+                              // ->setInterestAmount(123.4312331324)
                               ->setInterestPercentage(5.6),
                           LoanPart::COMPONENT_LOAN,
-                          'Deel 1'
+                          'Deel 1',
+                          [
+                            'negativeInterest' => false,
+                          ]
                       ),
 
           $loan_2 =   new LoanPart(
                           (new LoanPartMutation())
                               ->setInterestType(LoanPartMutation::INTEREST_SIMPLE)
-                              ->setAmount(100, 'EUR')
+                              ->setAmount(4500, 'EUR')
                               ->setInterestPercentage(2.3),
                           LoanPart::COMPONENT_GRANT,
-                          'Deel 2'
+                          'Deel 2',
+                          [
+                            'negativeInterest' => false,
+                          ]
                       ),
       ],
       '2016-01-01'
@@ -43,26 +49,26 @@ require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'boo
 
   /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
- $loan_1->addMutation(
-     (new LoanPartMutation('2016-02-01'))
-         ->setAmountMutation(1000, 'EUR')
- );
+ // $loan_1->addMutation(
+ //     (new LoanPartMutation('2016-02-01'))
+ //         ->setAmountMutation(1000, 'EUR')
+ // );
 
- $loan_1->addMutation(
-     (new LoanPartMutation('2016-03-01'))
-         ->setAmountMutation(1000, 'EUR')
- );
+ // $loan_1->addMutation(
+ //     (new LoanPartMutation('2016-03-01'))
+ //         ->setAmountMutation(1000, 'EUR')
+ // );
 
- $loan_1->addMutation(
-     (new LoanPartMutation('2016-12-10'))
-         ->setAmountMutation(-1000, 'EUR')
- );
+ // $loan_1->addMutation(
+ //     (new LoanPartMutation('2016-12-10'))
+ //         ->setAmountMutation(-1000, 'EUR')
+ // );
 
- $loan_1->addMutation(
-     (new LoanPartMutation('2016-12-20'))
-         ->setInterestAmountMutation(-100, 'EUR')
-         ->setAmountMutation(-200, 'EUR')
- );
+ // $loan_1->addMutation(
+ //     (new LoanPartMutation('2016-12-20'))
+ //         ->setInterestAmountMutation(-100, 'EUR')
+ //         ->setAmountMutation(-200, 'EUR')
+ // );
 
 //
  // $loan_1->addMutation(
@@ -98,7 +104,7 @@ require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'boo
   $loan_2->addMutation(
       (new LoanPartMutation('2016-02-01'))
           ->setInterestPercentage(6.9)
-          ->setAmountMutation(1000)
+          ->setAmountMutation(-10000)
   );
 
   $loan_2->addMutation(
