@@ -92,6 +92,7 @@ class Loan implements \JsonSerializable {
                                 'identifier' => $part,
                                 'type' => @$this->M_a_loanParts[$part]->getDetails()['type'],
                                 'initial_mutation' => $countPartsEqOne ? reset($L_a_jsonObject->mutations->$part) : $L_a_jsonObject->mutations->$part->{0},
+                                'options' => @$this->M_a_loanParts[$part]->getLoanPartOptions(),
                             ];
                             unset($L_a_jsonObject->parts[$k]);
                             if($countPartsEqOne){
@@ -188,6 +189,11 @@ class Loan implements \JsonSerializable {
 
                         $loanParts = [];
                         foreach($L_a_data->parts as $part=>$partData){
+                            $loanPartOptions = [];
+                            if(isset($partData->options) && (is_array($partData->options) || is_object($partData->options)) && !empty($partData->options)){
+                                $loanPartOptions = (array) $partData->options;
+                            }
+
                             $loanPart = new LoanPart(
                                 (new LoanPartMutation())
                                     ->setInterestType(constant('iPublications\\Financial\\LoanPartMutation::' . $partData->initial_mutation->interest_type))
@@ -195,7 +201,8 @@ class Loan implements \JsonSerializable {
                                     ->setInterestAmount( (float) @$partData->initial_mutation->interestamount)
                                     ->setInterestPercentage($partData->initial_mutation->interest_percentage),
                                 constant('iPublications\\Financial\\LoanPart::' . $partData->type),
-                                $partData->identifier
+                                $partData->identifier,
+                                $loanPartOptions
                             );
 
                             if(!empty($L_a_data->mutations->$part)){

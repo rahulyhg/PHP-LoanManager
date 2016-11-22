@@ -20,13 +20,15 @@ class LoanPart implements \JsonSerializable {
     private $M_a_loanPartMutations;
     private $M_s_loanPartIdentifier;
     private $M_s_loanPartType;
+    private $M_a_loanPartOptions = [];
 
     /**
      * Magic Methods
      **/
 
-    public function __construct(LoanPartMutation $P_o_mutation, $P_s_loanPartType, $P_s_loanPartIdentification){
+    public function __construct(LoanPartMutation $P_o_mutation, $P_s_loanPartType, $P_s_loanPartIdentification, $P_a_loanPartOptions = []){
         $L_b_validLoanPartType = false;
+
         if(is_string($P_s_loanPartType)){
             $L_s_loanPartType = trim(strtoupper($P_s_loanPartType));
             if($L_s_loanPartType == self::COMPONENT_LOAN || $L_s_loanPartType == self::COMPONENT_GRANT){
@@ -41,6 +43,14 @@ class LoanPart implements \JsonSerializable {
 
         if(!$L_b_validLoanPartType){
             throw new Exception(__METHOD__ . ": invalid loanType, ENUM[ COMPONENT_LOAN, COMPONENT_GRANT ]");
+        }
+
+        if(is_array($P_a_loanPartOptions) && !empty($P_a_loanPartOptions)){
+            foreach($P_a_loanPartOptions as $loanPartOptionKey => $loanPartOptionValue){
+                if(preg_match("@^[a-zA-Z0-9]{3,}$@", $loanPartOptionKey)){
+                    $this->M_a_loanPartOptions[strtoupper($loanPartOptionKey)] = (bool) $loanPartOptionValue;
+                }
+            }
         }
 
         $this->addMutation($P_o_mutation);
@@ -61,6 +71,10 @@ class LoanPart implements \JsonSerializable {
     /**
      * Public Methods
      **/
+
+    public function getLoanPartOptions(){
+        return (array) $this->M_a_loanPartOptions;
+    }
 
     public function addMutation(LoanPartMutation $P_o_mutation){
         $this->validateMutationDate($P_o_mutation);

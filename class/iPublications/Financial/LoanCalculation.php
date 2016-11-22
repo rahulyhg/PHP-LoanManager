@@ -117,6 +117,11 @@ class LoanCalculation implements \JsonSerializable {
             $this->M_a_mutationTotals[$P_o_loanPart->getIdentifier()] = $this->constructLoanPartMutationTotals();
         }
 
+        $L_b_negativeInterest     = true;
+        if(isset($P_o_loanPart->getLoanPartOptions()['NEGATIVEINTEREST']) && !$P_o_loanPart->getLoanPartOptions()['NEGATIVEINTEREST']){
+            $L_b_negativeInterest = false;
+        }
+
         $L_loanAmount             = (float)  $L_a_mutations[0]->getAmount();
         $L_loanInterestPercentage = (float)  $L_a_mutations[0]->getInterestPercentage();
         $L_loanCurrency           = (string) $L_a_mutations[0]->getCurrency();
@@ -192,13 +197,17 @@ class LoanCalculation implements \JsonSerializable {
                 $additionalInterest = ( ($L_loanAmount+$L_interestAmount) * (1+$I_f_dayInterest) ) - ($L_loanAmount+$L_interestAmount);
             }
 
-            if($additionalInterest > 0 || $additionalInterest < 0){
+            if($additionalInterest > 0 || ($additionalInterest < 0 && $L_b_negativeInterest)){
                 $L_interestAmount += $additionalInterest;
                 $I_a_mutations['InterestAmount'] = '{'.$L_loanCurrency.'} +=> {'.$additionalInterest.'}';
-                if((float) $additionalInterest > 0){
-                    $this->M_a_mutationTotals[$P_o_loanPart->getIdentifier()]['interest']['increase']
-                        += $additionalInterest;
-                }
+
+                // if((float) $additionalInterest > 0){
+                // Increase can be negative (decrease)
+                // but it would still be a result on the
+                // sum of interest. Skip the if-statement
+                $this->M_a_mutationTotals[$P_o_loanPart->getIdentifier()]['interest']['increase']
+                    += $additionalInterest;
+                // }
 
             }
 
