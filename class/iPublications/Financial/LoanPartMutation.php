@@ -106,7 +106,7 @@ class LoanPartMutation implements \JsonSerializable {
             throw new Exception(__METHOD__ . ": invalid value, expects int or float");
         }
 
-        $this->M_f_loanAmountMutation = (float) $P_f_loanAmountMutation;
+        $this->M_f_loanAmountMutation += (float) $P_f_loanAmountMutation;
 
         return $this;
     }
@@ -116,7 +116,7 @@ class LoanPartMutation implements \JsonSerializable {
             throw new Exception(__METHOD__ . ": invalid value, expects int or float");
         }
 
-        $this->M_f_interestAmountMutation = (float) $P_f_interestAmountMutation;
+        $this->M_f_interestAmountMutation += (float) $P_f_interestAmountMutation;
 
         if($this->M_f_interestAmountMutation > 0){
             throw new Exception(__METHOD__ . ": invalid value, expects *negative* int or float (deduction)");
