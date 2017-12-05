@@ -12,8 +12,9 @@ $periodsPerAnnual = 12;
 $monthCount = (int) $_GET["monthcount"];
 $interestPct = ((float) $_GET["interest"]);
 $debt = (float) $_GET["debt"];
+$respitePeriods = (int) @$_GET["respitePeriods"];
 
-$v = new Financial_AnnuityLoan($periodsPerAnnual, $monthCount, $interestPct/100, $debt);
+$v = new Financial_AnnuityLoan($periodsPerAnnual, $monthCount, $interestPct/100, $debt, $respitePeriods);
 
 $out = [
     '_meta' => [
